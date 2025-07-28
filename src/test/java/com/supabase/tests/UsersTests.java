@@ -96,13 +96,5 @@ public class UsersTests extends TestBase {
     }
 
 
-    @Test(dependsOnMethods = "verifyUpdatedUser")
-    public void deleteUser() {
-        given()
-                .queryParam("apikey", apiKey)
-                .when()
-                .delete("/users?id=eq." + userId)
-                .then()
-                .statusCode(204);
-    }
+
 }

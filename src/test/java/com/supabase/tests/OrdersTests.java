@@ -20,84 +20,85 @@ import static org.testng.Assert.fail;
 public class OrdersTests extends TestBase {
 
     private static String createdId;
-    @BeforeClass
-    public void waitBeforeOrders() throws InterruptedException {
-        Thread.sleep(3000);
-    }
+
 
     @Test
     public void createOrder() throws Exception {
-        // 🔍 Check if user exists in DB before proceeding
-        given()
-                .queryParam("apikey", apiKey)
-                .queryParam("id", "eq." + TestData.createdUserId)
-                .when()
-                .get("/users")
-                .then()
-                .statusCode(200)
-                .body("size()", greaterThan(0));
 
-        // Read and update payload
-        String payload = new String(Files.readAllBytes(Paths.get("src/test/resources/data/create_order.json")))
+
+        // ✅ Prepare payload with actual user/product IDs
+        String payload = new String(Files.readAllBytes(Paths.get("src/test/resources/data/create_orders.json")))
                 .replace("sample-user-id", TestData.createdUserId)
                 .replace("sample-product-id", TestData.createdProductId);
 
-        // 🔁 Retry logic for order creation
-        int maxRetries = 5;
-        for (int i = 0; i < maxRetries; i++) {
-            Response response = given()
-                    .queryParam("apikey", apiKey)
-                    .contentType(ContentType.JSON)
-                    .header("Prefer", "return=representation")
-                    .body(payload)
-                    .when()
-                    .post("/orders");
+        // ✅ Create order (single attempt only)
+        Response response = given()
+                .queryParam("apikey", apiKey)
+                .contentType(ContentType.JSON)
+                .header("Prefer", "return=representation")
+                .body(payload)
+                .when()
+                .post("/orders")
+                .then()
+                .statusCode(201)
+                .extract().response();
 
-            if (response.getStatusCode() == 201) {
-                System.out.println("✅ Order created on attempt #" + (i + 1));
-                String orderId = response.jsonPath().getString("[0].id");
-                orderId = response.jsonPath().getString("[0].id");
-                TestData.createdOrderId = orderId;
-                break;
-            }
-
-            System.out.println("⚠️ Attempt #" + (i + 1) + " failed with " + response.getStatusCode());
-            Thread.sleep(1000);
-
-            if (i == maxRetries - 1) {
-                fail("Order creation failed after retries: " + response.asPrettyString());
-            }
-        }
+        // ✅ Extract and store order ID
+        String orderId = response.jsonPath().getString("[0].id");
+        TestData.createdOrderId = orderId;
+        System.out.println("✅ Order created: " + orderId);
     }
+
+
 
 
     @Test(dependsOnMethods = "createOrder")
     public void getOrders() {
         given()
-            .when()
-                .get("/orders/" + createdId)
-            .then()
+                .queryParam("apikey", apiKey)
+                .queryParam("id", "eq." + TestData.createdOrderId)
+                .when()
+                .get("/orders")
+                .then()
                 .statusCode(200)
-                .body("id", equalTo(createdId));
+                .body("[0].id", equalTo(TestData.createdOrderId));
     }
+
 
     @Test(dependsOnMethods = "getOrders")
     public void updateOrders() {
-        String updatedPayload = readJsonFile("data/update_orders.json");
+        String updatedPayload = readJsonFile("data/update_orders.json")
+                .replace("sample-user-id", TestData.createdUserId)
+                .replace("sample-product-id", TestData.createdProductId);
+
+        System.out.println("🔄 PATCH payload: " + updatedPayload);
+
         given()
+                .queryParam("apikey", apiKey)
+                .queryParam("id", "eq." + TestData.createdOrderId)
+                .contentType(ContentType.JSON)
                 .body(updatedPayload)
-            .when()
-                .patch("/orders/" + createdId)
-            .then()
+                .when()
+                .patch("/orders")
+                .then()
                 .statusCode(204);
     }
 
     @Test(dependsOnMethods = "updateOrders")
-    public void deleteOrders() {
+    public void verifyOrderUpdated() {
         given()
-            .when()
-                .delete("/orders/" + createdId)
-            .then()
-                .statusCode(204);
+                .queryParam("apikey", apiKey)
+                .queryParam("id", "eq." + TestData.createdOrderId)
+                .when()
+                .get("/orders")
+                .then()
+                .statusCode(200)
+                .body("[0].user_id", equalTo(TestData.createdUserId))
+                .body("[0].product_id", equalTo(TestData.createdProductId))
+                .body("[0].quantity", equalTo(1));
     }
+
+
+
+
 }

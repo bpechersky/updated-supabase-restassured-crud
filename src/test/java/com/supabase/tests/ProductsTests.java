@@ -60,15 +60,6 @@ public class ProductsTests extends TestBase {
     }
 
 
-    @Test(dependsOnMethods = "updateProducts")
-    public void deleteProducts() {
-        given()
-                .queryParam("apikey", apiKey)
-                .queryParam("id", "eq." + createdId)
-                .when()
-                .delete("/products")
-                .then()
-                .statusCode(204);
-    }
+
 
 }
