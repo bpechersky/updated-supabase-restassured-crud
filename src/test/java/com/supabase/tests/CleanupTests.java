@@ -35,5 +35,6 @@ public class CleanupTests {
                     .then()
                     .statusCode(anyOf(is(200), is(204)));
         }
+
     }
 }
