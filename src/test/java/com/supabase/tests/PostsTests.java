@@ -66,5 +66,6 @@ public class PostsTests extends TestBase {
                 .delete("/posts")
                 .then()
                 .statusCode(204);
+
     }
 }
