@@ -1,6 +1,7 @@
 package com.supabase.tests;
 
 import com.supabase.base.TestBase;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
 import java.util.UUID;
@@ -15,6 +16,9 @@ public class ProductsTests extends TestBase {
     public void createProducts() {
         String payload = readJsonFile("data/create_products.json");
         Response response = given()
+                .queryParam("apikey", apiKey)
+                .contentType(ContentType.JSON)
+                .header("Prefer", "return=representation")
                 .body(payload)
             .when()
                 .post("/products")
@@ -22,36 +26,48 @@ public class ProductsTests extends TestBase {
                 .statusCode(201)
                 .extract().response();
 
-        createdId = response.jsonPath().getString("id");
+        createdId = response.jsonPath().getString("[0].id");
+
     }
 
     @Test(dependsOnMethods = "createProducts")
     public void getProducts() {
         given()
-            .when()
-                .get("/products/" + createdId)
-            .then()
+                .queryParam("apikey", apiKey)
+                .queryParam("id", "eq." + createdId)
+                .when()
+                .get("/products")
+                .then()
                 .statusCode(200)
-                .body("id", equalTo(createdId));
+                .body("[0].id", equalTo(createdId));
     }
+
 
     @Test(dependsOnMethods = "getProducts")
     public void updateProducts() {
         String updatedPayload = readJsonFile("data/update_products.json");
         given()
+                .queryParam("apikey", apiKey)
+                .queryParam("id", "eq." + createdId)
+                .contentType(ContentType.JSON)
+                .header("Prefer", "return=representation")
                 .body(updatedPayload)
-            .when()
-                .patch("/products/" + createdId)
-            .then()
-                .statusCode(204);
+                .when()
+                .patch("/products")
+                .then()
+                .statusCode(200);
     }
+
 
     @Test(dependsOnMethods = "updateProducts")
     public void deleteProducts() {
         given()
-            .when()
-                .delete("/products/" + createdId)
-            .then()
+                .queryParam("apikey", apiKey)
+                .queryParam("id", "eq." + createdId)
+                .when()
+                .delete("/products")
+                .then()
                 .statusCode(204);
     }
+
 }
