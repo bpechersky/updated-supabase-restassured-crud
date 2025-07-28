@@ -79,7 +79,8 @@ public class CommentsTests extends TestBase {
                 .when()
                 .delete("/comments") // ✅ No ID in the path
                 .then()
-                .statusCode(204);
+                .statusCode(204)
+                .log().all();
     }
 
 
