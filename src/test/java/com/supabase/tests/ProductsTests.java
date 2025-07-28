@@ -1,6 +1,7 @@
 package com.supabase.tests;
 
 import com.supabase.base.TestBase;
+import com.supabase.base.TestData;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
@@ -27,7 +28,7 @@ public class ProductsTests extends TestBase {
                 .extract().response();
 
         createdId = response.jsonPath().getString("[0].id");
-
+        TestData.createdProductId = createdId; // <-- Store globally
     }
 
     @Test(dependsOnMethods = "createProducts")

@@ -2,6 +2,7 @@ package com.supabase.tests;
 
 import com.google.gson.JsonObject;
 import com.supabase.base.TestBase;
+import com.supabase.base.TestData;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
@@ -37,6 +38,7 @@ public class UsersTests extends TestBase {
 
         // Try default extraction first
         userId = response.jsonPath().getString("[0].id"); // ✅ Get the first user's ID
+        TestData.createdUserId = userId; // <-- Store globally
 
 
         // If needed, fallback to nested extraction (uncomment below if previous line gives null):
@@ -44,6 +46,7 @@ public class UsersTests extends TestBase {
 
         // Print userId for debugging
         System.out.println("Extracted userId: " + userId);
+        System.out.println("Saved in TestData.createdUserId: " + TestData.createdUserId);
     }
 
 

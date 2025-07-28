@@ -1,0 +1,10 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Supabase API Suite">
+    <test name="All Tests">
+        <classes>
+            <class name="com.supabase.tests.UsersTests"/>
+            <class name="com.supabase.tests.ProductsTests"/>
+            <class name="com.supabase.tests.OrdersTests"/>
+        </classes>
+    </test>
+</suite>
