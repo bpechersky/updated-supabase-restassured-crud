@@ -6,6 +6,7 @@
             <class name="com.supabase.tests.ProductsTests"/>
             <class name="com.supabase.tests.OrdersTests"/>
             <class name="com.supabase.tests.CommentsTests"/>
+            <class name="com.supabase.tests.PostsTests"></class>
             <class name="com.supabase.tests.CleanupTests"/>
         </classes>
     </test>

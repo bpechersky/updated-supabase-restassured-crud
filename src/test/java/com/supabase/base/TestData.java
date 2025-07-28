@@ -5,6 +5,8 @@ public class TestData {
     public static String createdUserId;
     public static String createdOrderId;
     public static String createdCommentId;
+    public static String createdPostId;
+
 
 
 }
