@@ -11,32 +11,18 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      API_KEY: ${{ secrets.SUPABASE_API_KEY }}
+      SUPABASE_BASE_URL: ${{ secrets.SUPABASE_BASE_URL }}
+      SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
 
     steps:
-      - name: ⬇️ Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: ☕ Set up Java
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
           java-version: '17'
+          distribution: 'temurin'
 
-      - name: 📦 Set up Maven
-        uses: stCarolas/setup-maven@v4.5
-        with:
-          maven-version: '3.9.6'
-
-      - name: 🔍 Verify Maven installation
-        run: mvn -version
-
-      - name: 🔧 Build and test with Maven
+      - name: Build and test with Maven
         run: mvn clean test
-
-      - name: 📤 Archive test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: suptest-reports
-          path: target/surefire-reports/
