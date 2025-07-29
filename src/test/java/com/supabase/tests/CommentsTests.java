@@ -13,8 +13,6 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class CommentsTests extends TestBase {
 
-    private static String createdCommentsId;
-
     @Test
     public void createComments() {
         String payload = readJsonFile("data/create_comments.json");
